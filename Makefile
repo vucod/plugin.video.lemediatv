@@ -6,5 +6,5 @@ clean:
 	rm -rf ../$(name).zip 
 
 zip: 
-	zip -r ../$(name).zip  ../$(name)
+	cd ../ && zip -r $(name).zip  $(name)
 
