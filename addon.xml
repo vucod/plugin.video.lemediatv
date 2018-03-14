@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.lemediatv" name="Lemediatv.fr" version="0.0.1" provider-name="divucol">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+		<import addon="script.module.urlresolver" version="4.0.17"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="main.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Watch Lemediatv.fr</summary>
+        <summary lang="fr_fr">Regardez Lemediatv.fr</summary>
+        <description lang="en_GB">Watch lemediatv.fr live </description>
+        <description lang="fr_fr">Regardez lemediatv.fr en direct</description>
+        <language></language>
+        <platform>all</platform>
+        <license>GPL-3.0</license>
+        <forum></forum>
+        <website>lemediatv.fr</website>
+        <email>tosnigary@gmail.com</email>
+        <source></source>
+        <news></news>
+        <disclaimer></disclaimer>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
