@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.lemediatv" name="Lemediatv.fr" version="0.0.2" provider-name="vucodil">
+<addon id="plugin.video.lemediatv" name="Lemediatv.fr" version="0.0.1" provider-name="vucodil">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
-		<import addon="script.module.urlresolver" version="4.0.17"/>
+        <import addon="script.module.requests" version="2.12.4"/>
+        <import addon="plugin.video.youtube"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="main.py">
         <provides>video</provides>

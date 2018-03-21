@@ -1,9 +1,12 @@
-## -*- coding: utf-8 -*-
-import sys,urllib
-import xbmc, xbmcgui, xbmcaddon, xbmcplugin
-import urlresolver
+import xbmc
+import xbmcgui
+import xbmcaddon
+import xbmcplugin
+import sys
+import urllib
 import urlparse
 import requests
+import youtube_resolver
 
 base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
@@ -13,75 +16,90 @@ _addon = xbmcaddon.Addon()
 _icon = _addon.getAddonInfo('icon')
 
 
-def scrap_url_yt():
+def scrap_website():
     """
-    Scrap the website of lemediatv.fr to get the playlist of videos.
+    Scrap the website of lemediatv.fr to get the video id of the currently played video.
     """
     url = "https://cms.inscreen.tv/Api/program/list/95/undefined"
     r = requests.get(url)
     playlist = r.json()
     videoid = playlist[0]['videoid']
-    title = playlist[0]['title']
-    url = 'https://www.youtube.com/watch?v='+videoid
-    return url,title
+    return videoid
 
-def build_url(query):
-    """
-    Build the addon url (plugin://)
-    """
-    return base_url + '?' + urllib.urlencode(query)
 
-def resolve_url(url):
+def resolve_url(videoid):
     """
-    Resolve the url in a playable stream using urlresolver
+    Resolve the url in a playable stream using youtube_resolver from the youtube plugin
     """
-    duration=7500   #in milliseconds
-    message = "Cannot Play URL"
-    stream_url = urlresolver.HostedMediaFile(url=url).resolve()
-    # If urlresolver returns false then the video url was not resolved.
-    if not stream_url:
+    live = False
+    streams = youtube_resolver.resolve(videoid)
+    if streams:
+        if streams[0].get('Live'):
+            if xbmc.getCondVisibility('System.HasAddon(%s)' % 'inputstream.adaptive') == 1:
+                streams = [stream for stream in streams if (stream.get('container') == 'mpd' and stream.get('Live') is True)]
+                live = True
+            else:
+                dialog = xbmcgui.Dialog()
+                dialog.notification("Inputstream.adaptive not installed", "Cannot play URL", xbmcgui.NOTIFICATION_INFO, 7500)
+                return False
+        if streams:
+            stream = streams[0]
+        title = 'Lemediatv.fr : ' + stream.get('meta', {}).get('video', {}).get('title', '').encode('latin1')
+        thumbnail = stream.get('meta', {}).get('images', {}).get('high', '')
+        stream_url = stream.get('url', '')
+        stream_headers = stream.get('headers', '')
+        if stream_headers:
+            stream_url += '|' + stream_headers
+        play_item = xbmcgui.ListItem(label=title, path=stream_url)
+        play_item.setInfo('video', {'Genre': 'Video', 'plot': 'Regardez Le Media en direct'})
+        play_item.setArt({'poster': thumbnail, 'thumb': thumbnail})
+        play_item.setContentLookup(False)
+        if live:
+            play_item.setMimeType('application/xml+dash')
+            play_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+            play_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+            if stream_headers:
+                play_item.setProperty('inputstream.adaptive.stream_headers', stream_headers)
+        return play_item
+    else:
         dialog = xbmcgui.Dialog()
-        dialog.notification("URL Resolver Error", message, xbmcgui.NOTIFICATION_INFO, duration)
+        dialog.notification("No resolved URL available", "Cannot play URL", xbmcgui.NOTIFICATION_INFO, 7500)
         return False
-    else:        
-        return stream_url    
+
 
 class MyPlayer(xbmc.Player):
     """
-    Create the custom player to concatenate the videos
+    Create a custom player to concatenate the videos
     """
-    def __init__ (self):
-        xbmc.Player.__init__(self)
-
     def onPlayBackEnded(self):
         xbmc.executebuiltin("XBMC.PlayMedia(plugin://plugin.video.lemediatv/?mode=play)")
 
+
 def play_video():
     """
-    Scrap and play a video from the website
+    Play the last video played in the website
     """
-    path,title = scrap_url_yt()
-    stream_url = resolve_url(path)
-    
-    play_item = xbmcgui.ListItem(path=path)
-    play_item.setInfo('video', {'Title': 'Lemediatv.fr : '+title.encode('utf-8'), 'Genre': 'Video', 'plot': 'Regardez Le Media en direct'})
-    player = MyPlayer()
-    player.play(stream_url, listitem=play_item)
+    videoid = scrap_website()
+    play_item = resolve_url(videoid)
+    if play_item:
+        player = MyPlayer()
+        player.play(play_item.getPath(), listitem=play_item)
 
-    # Wait until playback starts
-    xbmc.sleep(500)  
-    while player.isPlaying():
+        # Wait until playback starts
         xbmc.sleep(500)
+        while player.isPlaying():
+            xbmc.sleep(500)
 
 
 xbmc.log("[plugin.video.lemedia]: Started Running")
 
 # Following the url used to access the plugin
 if sys.argv[2] == '':
-    url = build_url({'mode' :'play'})
+    # Build the addon url (plugin://)
+    url = base_url + '?' + urllib.urlencode({'mode': 'play'})
 
     li = xbmcgui.ListItem('Regardez Le Media en direct')
-    li.setProperty('IsFolder' , 'False')
+    li.setProperty('IsFolder', 'False')
     li.setArt({'thumb': 'https://www.lemediatv.fr/sites/default/files/media-logo.png'})
     li.setContentLookup(False)
     li.addStreamInfo('audio', {'language': 'fr'})
@@ -93,4 +111,4 @@ if sys.argv[2] == '':
 else:
     play_video()
 
-xbmc.log("[plugin.video.lemedia] : Finished Running")
+xbmc.log("[plugin.video.lemedia]: Finished Running")
