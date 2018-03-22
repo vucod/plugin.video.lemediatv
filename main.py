@@ -32,7 +32,12 @@ def resolve_url(videoid):
     Resolve the url in a playable stream using youtube_resolver from the youtube plugin
     """
     live = False
-    streams = youtube_resolver.resolve(videoid)
+    try:
+        streams = youtube_resolver.resolve(videoid)
+    except Exception:
+        dialog = xbmcgui.Dialog()
+        dialog.notification("Stream offline (Probably)", "Wait until live", xbmcgui.NOTIFICATION_INFO, 10000)
+        quit()
     if streams:
         if streams[0].get('Live'):
             if xbmc.getCondVisibility('System.HasAddon(%s)' % 'inputstream.adaptive') == 1:
