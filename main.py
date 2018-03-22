@@ -98,12 +98,12 @@ if sys.argv[2] == '':
     # Build the addon url (plugin://)
     url = base_url + '?' + urllib.urlencode({'mode': 'play'})
 
-    li = xbmcgui.ListItem('Regardez Le Media en direct')
+    li = xbmcgui.ListItem('Regardez Le Média en direct')
     li.setProperty('IsFolder', 'False')
     li.setArt({'thumb': 'https://www.lemediatv.fr/sites/default/files/media-logo.png'})
     li.setContentLookup(False)
     li.addStreamInfo('audio', {'language': 'fr'})
-    li.setInfo('video', {'Title': 'Lemediatv.fr', 'Genre': 'Video', 'plot': 'Regardez Le Media en direct'})
+    li.setInfo('video', {'Title': 'Le média TV', 'Genre': 'Video', 'plot': 'Regardez Le Média en direct'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
 
     xbmcplugin.endOfDirectory(addon_handle)
