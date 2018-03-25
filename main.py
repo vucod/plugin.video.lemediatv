@@ -1,3 +1,4 @@
+# # -*- coding: utf-8 -*-
 import xbmc
 import xbmcgui
 import xbmcaddon
@@ -56,7 +57,7 @@ def resolve_url(videoid):
         if stream_headers:
             stream_url += '|' + stream_headers
         play_item = xbmcgui.ListItem(label=title, path=stream_url)
-        play_item.setInfo('video', {'Genre': 'Video', 'plot': 'Regardez Le Media en direct'})
+        play_item.setInfo('video', {'Genre': 'Video', 'plot': 'Regardez Le Média en direct'})
         play_item.setArt({'poster': thumbnail, 'thumb': thumbnail})
         play_item.setContentLookup(False)
         if live:
@@ -108,7 +109,7 @@ if sys.argv[2] == '':
     li.setArt({'thumb': 'https://www.lemediatv.fr/sites/default/files/media-logo.png'})
     li.setContentLookup(False)
     li.addStreamInfo('audio', {'language': 'fr'})
-    li.setInfo('video', {'Title': 'Le média TV', 'Genre': 'Video', 'plot': 'Regardez Le Média en direct'})
+    li.setInfo('video', {'Title': 'Le Média TV', 'Genre': 'Video', 'plot': 'Regardez Le Média en direct'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
 
     xbmcplugin.endOfDirectory(addon_handle)
