@@ -37,7 +37,7 @@ def resolve_url(videoid):
         streams = youtube_resolver.resolve(videoid)
     except Exception:
         dialog = xbmcgui.Dialog()
-        dialog.notification("Stream offline (Probably)", "Wait until live", xbmcgui.NOTIFICATION_INFO, 10000)
+        dialog.notification(_addon.getLocalizedString(32002), _addon.getLocalizedString(32003), xbmcgui.NOTIFICATION_INFO, 10000)
         quit()
     if streams:
         if streams[0].get('Live'):
@@ -46,18 +46,18 @@ def resolve_url(videoid):
                 live = True
             else:
                 dialog = xbmcgui.Dialog()
-                dialog.notification("Inputstream.adaptive not installed", "Cannot play URL", xbmcgui.NOTIFICATION_INFO, 7500)
+                dialog.notification(_addon.getLocalizedString(32004), _addon.getLocalizedString(32005), xbmcgui.NOTIFICATION_INFO, 7500)
                 return False
         if streams:
             stream = streams[0]
-        title = 'Lemediatv.fr : ' + stream.get('meta', {}).get('video', {}).get('title', '').encode('latin1')
+        title = _addon.getLocalizedString(32006) + stream.get('meta', {}).get('video', {}).get('title', '').encode('latin1')
         thumbnail = stream.get('meta', {}).get('images', {}).get('high', '')
         stream_url = stream.get('url', '')
         stream_headers = stream.get('headers', '')
         if stream_headers:
             stream_url += '|' + stream_headers
         play_item = xbmcgui.ListItem(label=title, path=stream_url)
-        play_item.setInfo('video', {'Genre': 'Video', 'plot': 'Regardez Le Média en direct'})
+        play_item.setInfo('video', {'Genre': 'Video', 'plot': _addon.getLocalizedString(32000)})
         play_item.setArt({'poster': thumbnail, 'thumb': thumbnail})
         play_item.setContentLookup(False)
         if live:
@@ -69,7 +69,7 @@ def resolve_url(videoid):
         return play_item
     else:
         dialog = xbmcgui.Dialog()
-        dialog.notification("No resolved URL available", "Cannot play URL", xbmcgui.NOTIFICATION_INFO, 7500)
+        dialog.notification(_addon.getLocalizedString(32007), _addon.getLocalizedString(32005), xbmcgui.NOTIFICATION_INFO, 7500)
         return False
 
 
@@ -104,12 +104,12 @@ if sys.argv[2] == '':
     # Build the addon url (plugin://)
     url = base_url + '?' + urllib.urlencode({'mode': 'play'})
 
-    li = xbmcgui.ListItem('Regardez Le Média en direct')
+    li = xbmcgui.ListItem(_addon.getLocalizedString(32000))
     li.setProperty('IsFolder', 'False')
     li.setArt({'thumb': 'https://www.lemediatv.fr/sites/default/files/media-logo.png'})
     li.setContentLookup(False)
     li.addStreamInfo('audio', {'language': 'fr'})
-    li.setInfo('video', {'Title': 'Le Média TV', 'Genre': 'Video', 'plot': 'Regardez Le Média en direct'})
+    li.setInfo('video', {'Title': _addon.getLocalizedString(32001), 'Genre': 'Video', 'plot': _addon.getLocalizedString(32000)})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li)
 
     xbmcplugin.endOfDirectory(addon_handle)
